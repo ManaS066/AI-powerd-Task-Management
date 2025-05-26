@@ -13,6 +13,7 @@ function TaskManager() {
   const [stats, setStats] = useState(null);
   const [filters, setFilters] = useState({ status: '', priority: '', category: '' });
   const [categories, setCategories] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchTasks();
@@ -176,22 +177,119 @@ function TaskManager() {
         <button onClick={() => handleExport('json')}>Export JSON</button>
       </div>
 
-      {/* Add Task Form */}
-      <form className="task-form" onSubmit={handleSubmit}>
-        <input name="title" placeholder="Title" value={form.title} onChange={handleChange} required />
-        <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} required />
-        <input name="status" placeholder="Status" value={form.status} onChange={handleChange} />
-        <input name="priority" placeholder="Priority" value={form.priority} onChange={handleChange} />
-        <input name="deadline" placeholder="Deadline" type="date" value={form.deadline} onChange={handleChange} />
-        <input name="category" placeholder="Category" value={form.category} onChange={handleChange} readOnly />
+     
 
-        <div className="button-group">
-          <button type="button" onClick={handlePredict} disabled={predicting}>
-            {predicting ? 'Predicting...' : 'Predict Category'}
-          </button>
-          <button type="submit">Add Task</button>
+      {/* Add Task Modal */}
+      {showModal && (
+        <div className="modal-bg" onClick={() => setShowModal(false)}>
+          <div className="modal-content enhanced-modal" onClick={e => e.stopPropagation()}>
+            <button
+              className="close-modal-btn"
+              onClick={() => setShowModal(false)}
+              aria-label="Close"
+              type="button"
+            >
+              &times;
+            </button>
+            <h2 className="modal-title">Add New Task</h2>
+            <form
+  className="task-form"
+  onSubmit={(e) => {
+    handleSubmit(e);
+    setShowModal(false);
+  }}
+  autoComplete="on"
+>
+  <div className="form-group">
+    <label>
+      <span>Title <span className="required">*</span></span>
+      <input
+        name="title"
+        placeholder="Task title"
+        value={form.title}
+        onChange={handleChange}
+        required
+        autoFocus
+      />
+    </label>
+
+    <label>
+      <span>Description <span className="required">*</span></span>
+      <textarea
+        name="description"
+        placeholder="Describe the task"
+        value={form.description}
+        onChange={handleChange}
+        required
+        rows={3}
+      />
+    </label>
+  </div>
+
+  <div className="form-row">
+    <label>
+      <span>Status</span>
+      <select name="status" value={form.status} onChange={handleChange}>
+        <option value="">Select status</option>
+        <option value="todo">To Do</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+    </label>
+    <label>
+      <span>Priority</span>
+      <select name="priority" value={form.priority} onChange={handleChange}>
+        <option value="">Select priority</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </label>
+  </div>
+
+  <div className="form-row">
+    <label>
+      <span>Deadline</span>
+      <input
+        name="deadline"
+        type="date"
+        value={form.deadline}
+        onChange={handleChange}
+      />
+    </label>
+
+    <label>
+      <span>Category</span>
+      <div className="category-group">
+        <input
+          name="category"
+          placeholder="Predicted category"
+          value={form.category}
+          onChange={handleChange}
+          readOnly
+          className="predicted-category"
+        />
+        <button
+          type="button"
+          className="predict-btn"
+          onClick={handlePredict}
+          disabled={predicting}
+        >
+          {predicting ? 'Predicting...' : 'Predict'}
+        </button>
+      </div>
+    </label>
+  </div>
+
+  <div className="button-group">
+    <button type="submit" className="submit-btn">➕ Add Task</button>
+    <button type="button" className="cancel-btn" onClick={() => setShowModal(false)}>❌ Cancel</button>
+  </div>
+</form>
+
+          </div>
         </div>
-      </form>
+      )}
 
       <hr />
 
@@ -219,6 +317,14 @@ function TaskManager() {
             ))}
           </ul>
         )}
+      </div>
+
+      
+       {/* Add Task Button */}
+      <div className="add-task-btn-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+        <button className="add-task-btn" onClick={() => setShowModal(true)}>
+          ➕ Add Task
+        </button>
       </div>
     </div>
   );
